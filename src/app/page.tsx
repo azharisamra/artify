@@ -1,9 +1,16 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react"
-import { motion, useScroll, useTransform, AnimatePresence, type Variants } from "framer-motion"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  AnimatePresence,
+  type Variants,
+  type MotionValue,
+} from "framer-motion";
 import {
   FiAperture,
   FiImage,
@@ -19,29 +26,28 @@ import {
   FiX,
   FiHeart,
   FiUser,
-} from "react-icons/fi"
-
+} from "react-icons/fi";
 
 interface GalleryItem {
-  id: number
-  category: string
-  title: string
-  image: string
-  height: string
+  id: number;
+  category: string;
+  title: string;
+  image: string;
+  height: string;
 }
 
 interface PricingPlan {
-  id: string
-  title: string
-  price: string
-  features: string[]
-  cta: string
-  highlighted: boolean
+  id: string;
+  title: string;
+  price: string;
+  features: string[];
+  cta: string;
+  highlighted: boolean;
 }
 
 interface MousePosition {
-  x: number
-  y: number
+  x: number;
+  y: number;
 }
 
 const fontStyles = `
@@ -106,7 +112,7 @@ html {
     scroll-behavior: auto !important;
   }
 }
-`
+`;
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -118,7 +124,7 @@ const fadeIn = {
       ease: [0.22, 1, 0.36, 1],
     },
   },
-}
+};
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -130,57 +136,7 @@ const staggerContainer = {
       ease: "easeOut",
     },
   },
-}
-
-const floatingAnimation = {
-  initial: { y: 0 },
-  animate: {
-    y: [0, -10, 0],
-    transition: {
-      duration: 4,
-      repeat: Number.POSITIVE_INFINITY,
-      repeatType: "reverse" as const,
-      ease: "easeInOut",
-    },
-  },
-}
-
-const pulseAnimation = {
-  initial: { scale: 1 },
-  animate: {
-    scale: [1, 1.05, 1],
-    transition: {
-      duration: 2,
-      repeat: Number.POSITIVE_INFINITY,
-      repeatType: "reverse" as const,
-      ease: "easeInOut",
-    },
-  },
-}
-
-const rotateAnimation = {
-  initial: { rotate: 0 },
-  animate: {
-    rotate: 360,
-    transition: {
-      duration: 20,
-      repeat: Number.POSITIVE_INFINITY,
-      ease: "linear",
-    },
-  },
-}
-
-const scrollReveal = {
-  hidden: { opacity: 0, y: 75 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.9,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
-}
+};
 
 const galleryItems: GalleryItem[] = [
   {
@@ -236,7 +192,7 @@ const galleryItems: GalleryItem[] = [
     category: "abstract",
     title: "Abstract Waves",
     image:
-      "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
+      "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
     height: "h-72",
   },
   {
@@ -244,7 +200,7 @@ const galleryItems: GalleryItem[] = [
     category: "landscape",
     title: "Fantasy World",
     image:
-      "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
     height: "h-96",
   },
   {
@@ -255,14 +211,14 @@ const galleryItems: GalleryItem[] = [
       "https://images.unsplash.com/photo-1624395213232-ea2bcd36b865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
     height: "h-88",
   },
-]
+];
 const additionalGalleryItems: GalleryItem[] = [
   {
     id: 10,
     category: "portrait",
     title: "Digital Self Portrait",
     image:
-      "https://images.unsplash.com/photo-1618172193763-c511deb635ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1064&q=80",
+      "https://images.unsplash.com/photo-1618172193763-c511deb635ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=1064&q=80",
     height: "h-72",
   },
   {
@@ -270,7 +226,7 @@ const additionalGalleryItems: GalleryItem[] = [
     category: "landscape",
     title: "Neon City",
     image:
-      "https://images.unsplash.com/photo-1604871000636-074fa5117945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
+      "https://images.unsplash.com/photo-1604871000636-074fa5117945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
     height: "h-80",
   },
   {
@@ -278,17 +234,22 @@ const additionalGalleryItems: GalleryItem[] = [
     category: "abstract",
     title: "Fluid Dynamics",
     image:
-      "https://images.unsplash.com/photo-1614851099511-773084f6911d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1614851099511-773084f6911d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
     height: "h-64",
   },
-]
+];
 
 const pricingPlans: PricingPlan[] = [
   {
     id: "starter",
     title: "Starter",
     price: "$9",
-    features: ["10 AI paintings per month", "Basic editing tools", "720p resolution", "Email support"],
+    features: [
+      "10 AI paintings per month",
+      "Basic editing tools",
+      "720p resolution",
+      "Email support",
+    ],
     cta: "Get Started",
     highlighted: false,
   },
@@ -320,75 +281,81 @@ const pricingPlans: PricingPlan[] = [
     cta: "Contact Sales",
     highlighted: false,
   },
-]
-
+];
 
 export default function AIPaintingTool() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState("all")
-  const [mousePosition, setMousePosition] = useState<MousePosition>({ x: 0, y: 0 })
-  const [cursorVariant, setCursorVariant] = useState("default")
-  const [scrolled, setScrolled] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
+  const [mousePosition, setMousePosition] = useState<MousePosition>({
+    x: 0,
+    y: 0,
+  });
+  const [cursorVariant, setCursorVariant] = useState("default");
+  const [scrolled, setScrolled] = useState(false);
 
-  const [showLoginModal, setShowLoginModal] = useState(false)
-  const [showSignupModal, setShowSignupModal] = useState(false)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showPricingModal, setShowPricingModal] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null)
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userEmail, setUserEmail] = useState("")
-  const [userPassword, setUserPassword] = useState("")
-  const [userName, setUserName] = useState("")
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [userPassword, setUserPassword] = useState("");
+  const [userName, setUserName] = useState("");
 
-  const [savedItems, setSavedItems] = useState<GalleryItem[]>([])
-  const [showMoreGallery, setShowMoreGallery] = useState(false)
-  const [showSuccessToast, setShowSuccessToast] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
-  const [promptText, setPromptText] = useState("")
-  const [selectedStyle, setSelectedStyle] = useState("realistic")
+  const [savedItems, setSavedItems] = useState<GalleryItem[]>([]);
+  const [showMoreGallery, setShowMoreGallery] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [promptText, setPromptText] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState("realistic");
 
-  const cursorRef = useRef<HTMLDivElement>(null)
-  const heroRef = useRef<HTMLElement>(null)
-  const featuresRef = useRef<HTMLElement>(null)
-  const galleryRef = useRef<HTMLElement>(null)
-  const pricingRef = useRef<HTMLElement>(null)
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const featuresRef = useRef<HTMLElement>(null);
+  const galleryRef = useRef<HTMLElement>(null);
+  const pricingRef = useRef<HTMLElement>(null);
 
-  const { scrollYProgress } = useScroll()
-  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1])
+  const { scrollYProgress } = useScroll();
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   const { scrollYProgress: featuresYProgress } = useScroll({
     target: featuresRef,
     offset: ["start end", "end start"],
-  })
+  });
 
   const { scrollYProgress: galleryYProgress } = useScroll({
     target: galleryRef,
     offset: ["start end", "end start"],
-  })
+  });
 
   const { scrollYProgress: pricingYProgress } = useScroll({
     target: pricingRef,
     offset: ["start end", "end start"],
-  })
+  });
 
-  const useParallax = (value: any, distance: number) => {
-    return useTransform(value, [0, 1], [-distance, distance])
-  }
+  const useParallax = (value: MotionValue<number>, distance: number) => {
+    return useTransform(value, [0, 1], [-distance, distance]);
+  };
 
-  const featuresParallax = useParallax(featuresYProgress, 100)
-  const galleryParallax = useParallax(galleryYProgress, 100)
-  const pricingParallax = useParallax(pricingYProgress, 100)
-
+  const featuresParallax = useParallax(featuresYProgress, 100);
+  const galleryParallax = useParallax(galleryYProgress, 100);
   const allGalleryItems = useMemo(
-    () => (showMoreGallery ? [...galleryItems, ...additionalGalleryItems] : galleryItems),
-    [showMoreGallery],
-  )
+    () =>
+      showMoreGallery
+        ? [...galleryItems, ...additionalGalleryItems]
+        : galleryItems,
+    [showMoreGallery]
+  );
 
   const filteredGallery = useMemo(
-    () => (activeTab === "all" ? allGalleryItems : allGalleryItems.filter((item) => item.category === activeTab)),
-    [activeTab, allGalleryItems],
-  )
+    () =>
+      activeTab === "all"
+        ? allGalleryItems
+        : allGalleryItems.filter((item) => item.category === activeTab),
+    [activeTab, allGalleryItems]
+  );
 
   const cursorVariants: Variants = {
     default: {
@@ -414,145 +381,148 @@ export default function AIPaintingTool() {
       backgroundColor: "rgba(168, 85, 247, 0.2)",
       mixBlendMode: "difference" as const,
     },
-  }
+  };
 
-  const enterButton = useCallback(() => setCursorVariant("button"), [])
-  const enterText = useCallback(() => setCursorVariant("text"), [])
-  const leaveButton = useCallback(() => setCursorVariant("default"), [])
+  const enterButton = useCallback(() => setCursorVariant("button"), []);
+  const enterText = useCallback(() => setCursorVariant("text"), []);
+  const leaveButton = useCallback(() => setCursorVariant("default"), []);
 
   const scrollToSection = useCallback((sectionId: string) => {
-    const element = document.getElementById(sectionId)
+    const element = document.getElementById(sectionId);
     if (element) {
-      const navbarHeight = 64 
-      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-      const offsetPosition = elementPosition - navbarHeight
+      const navbarHeight = 64;
+      const elementPosition =
+        element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - navbarHeight;
 
       window.scrollTo({
         top: offsetPosition,
         behavior: "smooth",
-      })
+      });
     }
-  }, [])
+  }, []);
+
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message);
+    setShowSuccessToast(true);
+    setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 3000);
+  }, []);
 
   const handleSaveItem = useCallback(
     (item: GalleryItem) => {
       if (!isLoggedIn) {
-        setShowLoginModal(true)
-        return
+        setShowLoginModal(true);
+        return;
       }
 
       if (savedItems.some((savedItem) => savedItem.id === item.id)) {
-        setSavedItems(savedItems.filter((savedItem) => savedItem.id !== item.id))
-        showToast("Removed from saved items")
+        setSavedItems(
+          savedItems.filter((savedItem) => savedItem.id !== item.id)
+        );
+        showToast("Removed from saved items");
       } else {
-        setSavedItems([...savedItems, item])
-        showToast("Added to saved items")
+        setSavedItems([...savedItems, item]);
+        showToast("Added to saved items");
       }
     },
-    [isLoggedIn, savedItems],
-  )
-
-  const showToast = useCallback((message: string) => {
-    setToastMessage(message)
-    setShowSuccessToast(true)
-    setTimeout(() => {
-      setShowSuccessToast(false)
-    }, 3000)
-  }, [])
+    [isLoggedIn, savedItems, showToast]
+  );
 
   const handleLogin = useCallback(
     (e: React.FormEvent) => {
-      e.preventDefault()
+      e.preventDefault();
       if (userEmail && userPassword) {
-        setIsLoggedIn(true)
-        setShowLoginModal(false)
-        showToast("Successfully logged in")
+        setIsLoggedIn(true);
+        setShowLoginModal(false);
+        showToast("Successfully logged in");
       }
     },
-    [userEmail, userPassword, showToast],
-  )
+    [userEmail, userPassword, showToast]
+  );
 
   const handleSignup = useCallback(
     (e: React.FormEvent) => {
-      e.preventDefault()
+      e.preventDefault();
       if (userEmail && userPassword && userName) {
-        setIsLoggedIn(true)
-        setShowSignupModal(false)
-        showToast("Account created successfully")
+        setIsLoggedIn(true);
+        setShowSignupModal(false);
+        showToast("Account created successfully");
       }
     },
-    [userEmail, userPassword, userName, showToast],
-  )
+    [userEmail, userPassword, userName, showToast]
+  );
 
   const handleLogout = useCallback(() => {
-    setIsLoggedIn(false)
-    showToast("Successfully logged out")
-  }, [showToast])
+    setIsLoggedIn(false);
+    showToast("Successfully logged out");
+  }, [showToast]);
 
   const handleCreateArt = useCallback(
     (e: React.FormEvent) => {
-      e.preventDefault()
+      e.preventDefault();
       if (!promptText) {
-        showToast("Please enter a prompt")
-        return
+        showToast("Please enter a prompt");
+        return;
       }
 
-      showToast("Creating your artwork...")
+      showToast("Creating your artwork...");
       setTimeout(() => {
-        setShowCreateModal(false)
-        showToast("Your artwork has been created!")
-      }, 2000)
+        setShowCreateModal(false);
+        showToast("Your artwork has been created!");
+      }, 2000);
     },
-    [promptText, showToast],
-  )
+    [promptText, showToast]
+  );
 
   const handleSelectPlan = useCallback(
     (plan: PricingPlan) => {
       if (!isLoggedIn) {
-        setShowLoginModal(true)
-        return
+        setShowLoginModal(true);
+        return;
       }
 
-      setSelectedPlan(plan)
-      setShowPricingModal(true)
+      setSelectedPlan(plan);
+      setShowPricingModal(true);
     },
-    [isLoggedIn],
-  )
+    [isLoggedIn]
+  );
   const handlePurchasePlan = useCallback(() => {
     if (selectedPlan) {
-      showToast(`Successfully subscribed to ${selectedPlan.title} plan!`)
-      setShowPricingModal(false)
+      showToast(`Successfully subscribed to ${selectedPlan.title} plan!`);
+      setShowPricingModal(false);
     }
-  }, [selectedPlan, showToast])
+  }, [selectedPlan, showToast]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-    }
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
 
-    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
-    }
-  }, [])
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      const offset = window.scrollY
+      const offset = window.scrollY;
       if (offset > 50) {
-        setScrolled(true)
+        setScrolled(true);
       } else {
-        setScrolled(false)
+        setScrolled(false);
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [])
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
@@ -609,7 +579,10 @@ export default function AIPaintingTool() {
             }}
           />
 
-          <svg className="absolute top-[30%] right-[10%] w-56 h-56 opacity-10" viewBox="0 0 100 100">
+          <svg
+            className="absolute top-[30%] right-[10%] w-56 h-56 opacity-10"
+            viewBox="0 0 100 100"
+          >
             <motion.path
               d="M50 15 L90 85 L10 85 Z"
               stroke="rgba(219, 39, 119, 0.2)"
@@ -712,7 +685,7 @@ export default function AIPaintingTool() {
         </svg>
 
         {[...Array(15)].map((_, index) => {
-          const size = 4 + (index % 4) * 2
+          const size = 4 + (index % 4) * 2;
           const positions = [
             { x: "10%", y: "20%" },
             { x: "20%", y: "40%" },
@@ -729,7 +702,7 @@ export default function AIPaintingTool() {
             { x: "45%", y: "90%" },
             { x: "55%", y: "30%" },
             { x: "65%", y: "60%" },
-          ]
+          ];
 
           return (
             <motion.div
@@ -753,7 +726,7 @@ export default function AIPaintingTool() {
                 delay: index * 0.2,
               }}
             />
-          )
+          );
         })}
       </div>
 
@@ -764,7 +737,10 @@ export default function AIPaintingTool() {
         animate={cursorVariant}
       />
 
-      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-purple-600 z-50 origin-left" style={{ scaleX }} />
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-purple-600 z-50 origin-left"
+        style={{ scaleX }}
+      />
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <motion.div
           className="absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-gradient-to-r from-purple-300/10 to-blue-300/10 blur-3xl"
@@ -809,7 +785,9 @@ export default function AIPaintingTool() {
 
       <nav
         className={`${
-          scrolled ? "bg-white/70 backdrop-blur-lg shadow-sm" : "bg-white/80 backdrop-blur-sm"
+          scrolled
+            ? "bg-white/70 backdrop-blur-lg shadow-sm"
+            : "bg-white/80 backdrop-blur-sm"
         } border-b border-gray-100 px-4 sm:px-6 lg:px-8 fixed top-0 left-0 right-0 z-40 transition-all duration-300`}
       >
         <div className="max-w-7xl mx-auto">
@@ -833,7 +811,9 @@ export default function AIPaintingTool() {
                 >
                   <FiAperture className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
                 </motion.div>
-                <span className="ml-2 text-lg sm:text-xl font-bold text-gray-900 font-cinzel">ArtifyAI</span>
+                <span className="ml-2 text-lg sm:text-xl font-bold text-gray-900 font-cinzel">
+                  ArtifyAI
+                </span>
               </motion.div>
             </div>
 
@@ -841,8 +821,8 @@ export default function AIPaintingTool() {
               <a
                 href="#features"
                 onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("features")
+                  e.preventDefault();
+                  scrollToSection("features");
                 }}
                 className="border-transparent text-gray-500 hover:border-purple-500 hover:text-purple-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 onMouseEnter={enterButton}
@@ -853,8 +833,8 @@ export default function AIPaintingTool() {
               <a
                 href="#how-it-works"
                 onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("how-it-works")
+                  e.preventDefault();
+                  scrollToSection("how-it-works");
                 }}
                 className="border-transparent text-gray-500 hover:border-purple-500 hover:text-purple-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 onMouseEnter={enterButton}
@@ -865,8 +845,8 @@ export default function AIPaintingTool() {
               <a
                 href="#gallery"
                 onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("gallery")
+                  e.preventDefault();
+                  scrollToSection("gallery");
                 }}
                 className="border-transparent text-gray-500 hover:border-purple-500 hover:text-purple-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 onMouseEnter={enterButton}
@@ -877,8 +857,8 @@ export default function AIPaintingTool() {
               <a
                 href="#pricing"
                 onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("pricing")
+                  e.preventDefault();
+                  scrollToSection("pricing");
                 }}
                 className="border-transparent text-gray-500 hover:border-purple-500 hover:text-purple-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 onMouseEnter={enterButton}
@@ -940,7 +920,12 @@ export default function AIPaintingTool() {
                   stroke="currentColor"
                   aria-hidden="true"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
                 <svg
                   className={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
@@ -950,7 +935,12 @@ export default function AIPaintingTool() {
                   stroke="currentColor"
                   aria-hidden="true"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -970,9 +960,9 @@ export default function AIPaintingTool() {
                 <a
                   href="#features"
                   onClick={(e) => {
-                    e.preventDefault()
-                    scrollToSection("features")
-                    setIsMenuOpen(false)
+                    e.preventDefault();
+                    scrollToSection("features");
+                    setIsMenuOpen(false);
                   }}
                   className="block pl-3 pr-4 py-3 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-500 hover:text-purple-700"
                 >
@@ -981,9 +971,9 @@ export default function AIPaintingTool() {
                 <a
                   href="#how-it-works"
                   onClick={(e) => {
-                    e.preventDefault()
-                    scrollToSection("how-it-works")
-                    setIsMenuOpen(false)
+                    e.preventDefault();
+                    scrollToSection("how-it-works");
+                    setIsMenuOpen(false);
                   }}
                   className="block pl-3 pr-4 py-3 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-500 hover:text-purple-700"
                 >
@@ -992,9 +982,9 @@ export default function AIPaintingTool() {
                 <a
                   href="#gallery"
                   onClick={(e) => {
-                    e.preventDefault()
-                    scrollToSection("gallery")
-                    setIsMenuOpen(false)
+                    e.preventDefault();
+                    scrollToSection("gallery");
+                    setIsMenuOpen(false);
                   }}
                   className="block pl-3 pr-4 py-3 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-500 hover:text-purple-700"
                 >
@@ -1003,9 +993,9 @@ export default function AIPaintingTool() {
                 <a
                   href="#pricing"
                   onClick={(e) => {
-                    e.preventDefault()
-                    scrollToSection("pricing")
-                    setIsMenuOpen(false)
+                    e.preventDefault();
+                    scrollToSection("pricing");
+                    setIsMenuOpen(false);
                   }}
                   className="block pl-3 pr-4 py-3 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-500 hover:text-purple-700"
                 >
@@ -1018,8 +1008,8 @@ export default function AIPaintingTool() {
                     <>
                       <button
                         onClick={() => {
-                          setShowCreateModal(true)
-                          setIsMenuOpen(false)
+                          setShowCreateModal(true);
+                          setIsMenuOpen(false);
                         }}
                         className="block pl-3 pr-4 py-3 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-500 hover:text-purple-700 w-full text-left"
                       >
@@ -1027,8 +1017,8 @@ export default function AIPaintingTool() {
                       </button>
                       <button
                         onClick={() => {
-                          handleLogout()
-                          setIsMenuOpen(false)
+                          handleLogout();
+                          setIsMenuOpen(false);
                         }}
                         className="block pl-3 pr-4 py-3 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-500 hover:text-purple-700 w-full text-left"
                       >
@@ -1038,8 +1028,8 @@ export default function AIPaintingTool() {
                   ) : (
                     <button
                       onClick={() => {
-                        setShowLoginModal(true)
-                        setIsMenuOpen(false)
+                        setShowLoginModal(true);
+                        setIsMenuOpen(false);
                       }}
                       className="w-full flex items-center justify-center px-8 py-4 text-xs uppercase tracking-widest font-medium rounded-full text-black bg-white border-none shadow-[0px_8px_15px_rgba(0,0,0,0.1)] hover:bg-purple-600 hover:text-white hover:shadow-[0px_15px_20px_rgba(124,58,237,0.4)] transition-all duration-300 ease-in-out"
                     >
@@ -1053,7 +1043,10 @@ export default function AIPaintingTool() {
         </AnimatePresence>
       </nav>
 
-      <section ref={heroRef} className="relative bg-white overflow-hidden pt-16 md:pt-20">
+      <section
+        ref={heroRef}
+        className="relative bg-white overflow-hidden pt-16 md:pt-20"
+      >
         <div className="absolute inset-0 pointer-events-none z-0">
           <motion.div
             className="absolute top-20 left-[10%] w-12 h-12 sm:w-20 sm:h-20 rounded-full border-2 border-purple-200"
@@ -1152,8 +1145,9 @@ export default function AIPaintingTool() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  Create beautiful, unique paintings in seconds with our advanced AI technology. No artistic skills
-                  required - just describe what you want, and watch the magic happen.
+                  Create beautiful, unique paintings in seconds with our
+                  advanced AI technology. No artistic skills required - just
+                  describe what you want, and watch the magic happen.
                 </motion.p>
                 <div className="mt-5 sm:mt-8 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-4">
                   <motion.div
@@ -1167,9 +1161,9 @@ export default function AIPaintingTool() {
                     <button
                       onClick={() => {
                         if (isLoggedIn) {
-                          setShowCreateModal(true)
+                          setShowCreateModal(true);
                         } else {
-                          setShowLoginModal(true)
+                          setShowLoginModal(true);
                         }
                       }}
                       className="w-full flex items-center justify-center px-8 py-4 sm:py-3 text-xs uppercase tracking-widest font-medium rounded-full text-black bg-white border-none shadow-[0px_8px_15px_rgba(0,0,0,0.1)] hover:bg-purple-600 hover:text-white hover:shadow-[0px_15px_20px_rgba(124,58,237,0.4)] cursor-pointer outline-none"
@@ -1236,7 +1230,11 @@ export default function AIPaintingTool() {
         </div>
       </section>
 
-      <section id="features" ref={featuresRef} className="py-12 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+      <section
+        id="features"
+        ref={featuresRef}
+        className="py-12 bg-gradient-to-b from-white to-gray-50 overflow-hidden"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div
             className="absolute top-10 right-10 w-40 h-40 rounded-full bg-purple-100/30 blur-xl"
@@ -1283,7 +1281,8 @@ export default function AIPaintingTool() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              Our powerful AI understands your vision and brings it to life with precision and creativity.
+              Our powerful AI understands your vision and brings it to life with
+              precision and creativity.
             </motion.p>
           </motion.div>
 
@@ -1309,10 +1308,13 @@ export default function AIPaintingTool() {
                   >
                     <FiImage className="h-6 w-6" />
                   </motion.div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-cinzel">Style Variety</p>
+                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-cinzel">
+                    Style Variety
+                  </p>
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-gray-500">
-                  Choose from dozens of artistic styles, from Renaissance to Cyberpunk, or create your own unique blend.
+                  Choose from dozens of artistic styles, from Renaissance to
+                  Cyberpunk, or create your own unique blend.
                 </dd>
               </motion.div>
 
@@ -1330,10 +1332,13 @@ export default function AIPaintingTool() {
                   >
                     <FiLayers className="h-6 w-6" />
                   </motion.div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-cinzel">Layer Control</p>
+                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-cinzel">
+                    Layer Control
+                  </p>
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-gray-500">
-                  Fine-tune your creations with advanced layer controls, allowing for precise adjustments.
+                  Fine-tune your creations with advanced layer controls,
+                  allowing for precise adjustments.
                 </dd>
               </motion.div>
 
@@ -1356,7 +1361,8 @@ export default function AIPaintingTool() {
                   </p>
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-gray-500">
-                  Control every aspect of your creation with intuitive sliders for color, composition, and detail.
+                  Control every aspect of your creation with intuitive sliders
+                  for color, composition, and detail.
                 </dd>
               </motion.div>
 
@@ -1379,7 +1385,8 @@ export default function AIPaintingTool() {
                   </p>
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-gray-500">
-                  Download your creations in ultra-high resolution, perfect for printing or digital display.
+                  Download your creations in ultra-high resolution, perfect for
+                  printing or digital display.
                 </dd>
               </motion.div>
             </dl>
@@ -1387,20 +1394,45 @@ export default function AIPaintingTool() {
         </div>
       </section>
 
-      <section id="how-it-works" className="py-16 bg-white overflow-hidden relative">
+      <section
+        id="how-it-works"
+        className="py-16 bg-white overflow-hidden relative"
+      >
         <div className="absolute inset-0 pointer-events-none">
-          <svg className="absolute left-0 top-0 h-48 w-48 text-purple-50" viewBox="0 0 200 200" fill="none">
+          <svg
+            className="absolute left-0 top-0 h-48 w-48 text-purple-50"
+            viewBox="0 0 200 200"
+            fill="none"
+          >
             <defs>
-              <pattern id="pattern-circles" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <pattern
+                id="pattern-circles"
+                x="0"
+                y="0"
+                width="20"
+                height="20"
+                patternUnits="userSpaceOnUse"
+              >
                 <circle cx="10" cy="10" r="1.5" fill="currentColor" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#pattern-circles)" />
           </svg>
 
-          <svg className="absolute right-0 bottom-0 h-48 w-48 text-purple-50" viewBox="0 0 200 200" fill="none">
+          <svg
+            className="absolute right-0 bottom-0 h-48 w-48 text-purple-50"
+            viewBox="0 0 200 200"
+            fill="none"
+          >
             <defs>
-              <pattern id="pattern-circles-2" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <pattern
+                id="pattern-circles-2"
+                x="0"
+                y="0"
+                width="20"
+                height="20"
+                patternUnits="userSpaceOnUse"
+              >
                 <circle cx="10" cy="10" r="1.5" fill="currentColor" />
               </pattern>
             </defs>
@@ -1416,18 +1448,25 @@ export default function AIPaintingTool() {
             variants={fadeIn}
             className="lg:text-center mb-12"
           >
-            <h2 className="text-base text-purple-600 font-semibold tracking-wide uppercase">How It Works</h2>
+            <h2 className="text-base text-purple-600 font-semibold tracking-wide uppercase">
+              How It Works
+            </h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl heading-cinzel">
               Create masterpieces in three simple steps
             </p>
           </motion.div>
 
           <div className="relative">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div
+              className="absolute inset-0 flex items-center"
+              aria-hidden="true"
+            >
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center">
-              <span className="px-3 bg-white text-lg font-medium text-gray-900">The Process</span>
+              <span className="px-3 bg-white text-lg font-medium text-gray-900">
+                The Process
+              </span>
             </div>
           </div>
 
@@ -1453,9 +1492,12 @@ export default function AIPaintingTool() {
                   1
                 </motion.span>
               </motion.div>
-              <h3 className="mt-6 text-xl font-medium text-gray-900">Describe Your Vision</h3>
+              <h3 className="mt-6 text-xl font-medium text-gray-900">
+                Describe Your Vision
+              </h3>
               <p className="mt-2 text-base text-gray-500">
-                Use natural language to describe the artwork you want to create. Be as detailed or abstract as you like.
+                Use natural language to describe the artwork you want to create.
+                Be as detailed or abstract as you like.
               </p>
               <motion.div
                 className="hidden lg:block absolute top-8 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-200 to-transparent"
@@ -1482,14 +1524,21 @@ export default function AIPaintingTool() {
                 <motion.span
                   className="text-xl font-bold"
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 0.3 }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    delay: 0.3,
+                  }}
                 >
                   2
                 </motion.span>
               </motion.div>
-              <h3 className="mt-6 text-xl font-medium text-gray-900">AI Creates Your Artwork</h3>
+              <h3 className="mt-6 text-xl font-medium text-gray-900">
+                AI Creates Your Artwork
+              </h3>
               <p className="mt-2 text-base text-gray-500">
-                Our advanced AI processes your description and generates multiple variations of your artwork in seconds.
+                Our advanced AI processes your description and generates
+                multiple variations of your artwork in seconds.
               </p>
 
               <motion.div
@@ -1517,15 +1566,21 @@ export default function AIPaintingTool() {
                 <motion.span
                   className="text-xl font-bold"
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 0.6 }}
+                  transition={{
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    delay: 0.6,
+                  }}
                 >
                   3
                 </motion.span>
               </motion.div>
-              <h3 className="mt-6 text-xl font-medium text-gray-900">Refine and Download</h3>
+              <h3 className="mt-6 text-xl font-medium text-gray-900">
+                Refine and Download
+              </h3>
               <p className="mt-2 text-base text-gray-500">
-                Fine-tune your favorite version with our intuitive editing tools, then download in your preferred
-                format.
+                Fine-tune your favorite version with our intuitive editing
+                tools, then download in your preferred format.
               </p>
             </motion.div>
           </div>
@@ -1536,7 +1591,10 @@ export default function AIPaintingTool() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
             className="mt-16 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg overflow-hidden shadow-xl"
-            whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(124, 58, 237, 0.25)" }}
+            whileHover={{
+              y: -5,
+              boxShadow: "0 25px 50px -12px rgba(124, 58, 237, 0.25)",
+            }}
           >
             <div className="px-4 py-5 sm:p-6">
               <div className="flex flex-col md:flex-row items-center">
@@ -1546,7 +1604,8 @@ export default function AIPaintingTool() {
                   </h3>
                   <div className="mt-2 max-w-xl text-sm text-gray-500">
                     <p>
-                      Join thousands of creators who are already using ArtifyAI to bring their artistic visions to life.
+                      Join thousands of creators who are already using ArtifyAI
+                      to bring their artistic visions to life.
                     </p>
                   </div>
                 </div>
@@ -1556,9 +1615,9 @@ export default function AIPaintingTool() {
                     whileTap={{ y: -1 }}
                     onClick={() => {
                       if (isLoggedIn) {
-                        setShowCreateModal(true)
+                        setShowCreateModal(true);
                       } else {
-                        setShowLoginModal(true)
+                        setShowLoginModal(true);
                       }
                     }}
                     className="inline-flex items-center px-8 py-3 text-xs uppercase tracking-widest font-medium rounded-full text-black bg-white border-none shadow-[0px_8px_15px_rgba(0,0,0,0.1)] hover:bg-purple-600 hover:text-white hover:shadow-[0px_15px_20px_rgba(124,58,237,0.4)] transition-all duration-300 ease-in-out"
@@ -1568,7 +1627,10 @@ export default function AIPaintingTool() {
                     Start Creating Now
                     <motion.div
                       animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Number.POSITIVE_INFINITY,
+                      }}
                     >
                       <FiArrowRight className="ml-2" />
                     </motion.div>
@@ -1620,12 +1682,15 @@ export default function AIPaintingTool() {
             variants={fadeIn}
             className="text-center mb-12"
           >
-            <h2 className="text-base text-purple-600 font-semibold tracking-wide uppercase">Gallery</h2>
+            <h2 className="text-base text-purple-600 font-semibold tracking-wide uppercase">
+              Gallery
+            </h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl heading-cinzel">
               Explore AI-generated masterpieces
             </p>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-              Browse through a collection of stunning artwork created with our AI technology.
+              Browse through a collection of stunning artwork created with our
+              AI technology.
             </p>
           </motion.div>
 
@@ -1710,7 +1775,8 @@ export default function AIPaintingTool() {
                   transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                   whileHover={{
                     y: -8,
-                    boxShadow: "0 20px 25px -5px rgba(124, 58, 237, 0.1), 0 10px 10px -5px rgba(124, 58, 237, 0.04)",
+                    boxShadow:
+                      "0 20px 25px -5px rgba(124, 58, 237, 0.1), 0 10px 10px -5px rgba(124, 58, 237, 0.04)",
                     transition: { duration: 0.4, ease: "easeOut" },
                   }}
                 >
@@ -1729,21 +1795,31 @@ export default function AIPaintingTool() {
                     >
                       <div className="p-4 text-white">
                         <h3 className="text-lg font-medium">{item.title}</h3>
-                        <p className="text-sm opacity-80 capitalize">Style: {item.category}</p>
+                        <p className="text-sm opacity-80 capitalize">
+                          Style: {item.category}
+                        </p>
                       </div>
                     </motion.div>
                   </div>
                   <div className="p-4 sm:p-6 backdrop-blur-lg bg-white/60 border-t border-white/40">
-                    <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
-                    <p className="mt-2 text-sm text-gray-600 capitalize">Style: {item.category}</p>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-600 capitalize">
+                      Style: {item.category}
+                    </p>
                     <div className="mt-4 flex justify-between items-center">
-                      <span className="text-sm text-purple-600 font-medium">Created with ArtifyAI</span>
+                      <span className="text-sm text-purple-600 font-medium">
+                        Created with ArtifyAI
+                      </span>
                       <motion.button
                         whileHover={{ y: -3 }}
                         whileTap={{ y: -1 }}
                         onClick={() => handleSaveItem(item)}
                         className={`inline-flex items-center px-3 sm:px-4 py-1.5 text-xs uppercase tracking-widest font-medium rounded-full ${
-                          savedItems.some((savedItem) => savedItem.id === item.id)
+                          savedItems.some(
+                            (savedItem) => savedItem.id === item.id
+                          )
                             ? "bg-purple-600/80 text-white"
                             : "bg-white/80 text-black"
                         } border-none shadow-[0px_4px_10px_rgba(0,0,0,0.1)] hover:bg-purple-600/80 hover:text-white hover:shadow-[0px_8px_15px_rgba(124,58,237,0.3)] transition-all duration-300 ease-in-out backdrop-blur-sm`}
@@ -1752,15 +1828,25 @@ export default function AIPaintingTool() {
                       >
                         <motion.div
                           animate={{ rotate: [0, 15, 0] }}
-                          transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, repeatDelay: 2 }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Number.POSITIVE_INFINITY,
+                            repeatDelay: 2,
+                          }}
                         >
-                          {savedItems.some((savedItem) => savedItem.id === item.id) ? (
+                          {savedItems.some(
+                            (savedItem) => savedItem.id === item.id
+                          ) ? (
                             <FiHeart className="mr-1 fill-current" />
                           ) : (
                             <FiStar className="mr-1" />
                           )}
                         </motion.div>
-                        {savedItems.some((savedItem) => savedItem.id === item.id) ? "Saved" : "Save"}
+                        {savedItems.some(
+                          (savedItem) => savedItem.id === item.id
+                        )
+                          ? "Saved"
+                          : "Save"}
                       </motion.button>
                     </div>
                   </div>
@@ -1784,7 +1870,11 @@ export default function AIPaintingTool() {
         </div>
       </section>
 
-      <section id="pricing" ref={pricingRef} className="py-16 bg-white relative overflow-hidden">
+      <section
+        id="pricing"
+        ref={pricingRef}
+        className="py-16 bg-white relative overflow-hidden"
+      >
         <div className="absolute inset-0 pointer-events-none">
           <svg
             className="absolute right-0 top-0 h-64 w-64 text-purple-50 transform translate-x-1/3 -translate-y-1/3"
@@ -1815,7 +1905,9 @@ export default function AIPaintingTool() {
             variants={fadeIn}
             className="text-center mb-12"
           >
-            <h2 className="text-base text-purple-600 font-semibold tracking-wide uppercase">Pricing</h2>
+            <h2 className="text-base text-purple-600 font-semibold tracking-wide uppercase">
+              Pricing
+            </h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl heading-cinzel">
               Plans for every creative need
             </p>
@@ -1841,7 +1933,9 @@ export default function AIPaintingTool() {
                   </div>
                   <div className="mt-4 flex items-baseline text-4xl sm:text-6xl font-extrabold">
                     {plan.price}
-                    <span className="ml-1 text-xl sm:text-2xl font-medium text-gray-500">/month</span>
+                    <span className="ml-1 text-xl sm:text-2xl font-medium text-gray-500">
+                      /month
+                    </span>
                   </div>
                   <p className="mt-5 text-base sm:text-lg text-gray-500">
                     {plan.highlighted
@@ -1855,7 +1949,9 @@ export default function AIPaintingTool() {
                     <li key={i} className="flex items-start">
                       <div className="flex-shrink-0">
                         <FiCheck
-                          className={`${plan.highlighted ? "text-white" : "text-purple-500"} h-5 w-5`}
+                          className={`${
+                            plan.highlighted ? "text-white" : "text-purple-500"
+                          } h-5 w-5`}
                           aria-hidden="true"
                         />
                       </div>
@@ -1889,7 +1985,9 @@ export default function AIPaintingTool() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0 text-center md:text-left">
-              <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} ArtifyAI. All rights reserved.</p>
+              <p className="text-sm text-gray-500">
+                &copy; {new Date().getFullYear()} ArtifyAI. All rights reserved.
+              </p>
             </div>
             <div className="flex space-x-6">
               <a
@@ -1934,13 +2032,19 @@ export default function AIPaintingTool() {
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold text-gray-900">Sign In</h3>
-                <button onClick={() => setShowLoginModal(false)} className="text-gray-400 hover:text-gray-500">
+                <button
+                  onClick={() => setShowLoginModal(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
                   <FiX className="h-5 w-5" />
                 </button>
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Email
                   </label>
                   <input
@@ -1953,7 +2057,10 @@ export default function AIPaintingTool() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Password
                   </label>
                   <input
@@ -1973,12 +2080,18 @@ export default function AIPaintingTool() {
                       type="checkbox"
                       className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="remember-me"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       Remember me
                     </label>
                   </div>
                   <div className="text-sm">
-                    <a href="#" className="font-medium text-purple-600 hover:text-purple-500">
+                    <a
+                      href="#"
+                      className="font-medium text-purple-600 hover:text-purple-500"
+                    >
                       Forgot password?
                     </a>
                   </div>
@@ -1994,11 +2107,11 @@ export default function AIPaintingTool() {
               </form>
               <div className="mt-4 text-center">
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <button
                     onClick={() => {
-                      setShowLoginModal(false)
-                      setShowSignupModal(true)
+                      setShowLoginModal(false);
+                      setShowSignupModal(true);
                     }}
                     className="font-medium text-purple-600 hover:text-purple-500"
                   >
@@ -2026,14 +2139,22 @@ export default function AIPaintingTool() {
               className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-gray-900">Create Account</h3>
-                <button onClick={() => setShowSignupModal(false)} className="text-gray-400 hover:text-gray-500">
+                <h3 className="text-xl font-bold text-gray-900">
+                  Create Account
+                </h3>
+                <button
+                  onClick={() => setShowSignupModal(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
                   <FiX className="h-5 w-5" />
                 </button>
               </div>
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Full Name
                   </label>
                   <input
@@ -2046,7 +2167,10 @@ export default function AIPaintingTool() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="signup-email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Email
                   </label>
                   <input
@@ -2059,7 +2183,10 @@ export default function AIPaintingTool() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="signup-password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Password
                   </label>
                   <input
@@ -2085,8 +2212,8 @@ export default function AIPaintingTool() {
                   Already have an account?{" "}
                   <button
                     onClick={() => {
-                      setShowSignupModal(false)
-                      setShowLoginModal(true)
+                      setShowSignupModal(false);
+                      setShowLoginModal(true);
                     }}
                     className="font-medium text-purple-600 hover:text-purple-500"
                   >
@@ -2114,14 +2241,22 @@ export default function AIPaintingTool() {
               className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-gray-900">Create AI Artwork</h3>
-                <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-gray-500">
+                <h3 className="text-xl font-bold text-gray-900">
+                  Create AI Artwork
+                </h3>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
                   <FiX className="h-5 w-5" />
                 </button>
               </div>
               <form onSubmit={handleCreateArt} className="space-y-4">
                 <div>
-                  <label htmlFor="prompt" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="prompt"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Describe your vision
                   </label>
                   <textarea
@@ -2135,7 +2270,10 @@ export default function AIPaintingTool() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="style" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="style"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Art Style
                   </label>
                   <select
@@ -2185,14 +2323,20 @@ export default function AIPaintingTool() {
               className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-gray-900">Subscribe to {selectedPlan.title} Plan</h3>
-                <button onClick={() => setShowPricingModal(false)} className="text-gray-400 hover:text-gray-500">
+                <h3 className="text-xl font-bold text-gray-900">
+                  Subscribe to {selectedPlan.title} Plan
+                </h3>
+                <button
+                  onClick={() => setShowPricingModal(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
                   <FiX className="h-5 w-5" />
                 </button>
               </div>
               <div className="mb-6">
                 <p className="text-gray-600">
-                  You're about to subscribe to the {selectedPlan.title} plan at {selectedPlan.price}/month.
+                  You&apos;re about to subscribe to the {selectedPlan.title}{" "}
+                  plan at {selectedPlan.price}/month.
                 </p>
                 <div className="mt-4">
                   <h4 className="font-medium text-gray-900">Plan includes:</h4>
@@ -2240,5 +2384,5 @@ export default function AIPaintingTool() {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }
