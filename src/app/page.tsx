@@ -330,6 +330,8 @@ export default function AIPaintingTool() {
     offset: ["start end", "end start"],
   });
 
+  
+
   const useParallax = (value: MotionValue<number>, distance: number) => {
     return useTransform(value, [0, 1], [-distance, distance]);
   };
